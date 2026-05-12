@@ -1,4 +1,4 @@
-package com.example.model;
+package com.documentqa.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
