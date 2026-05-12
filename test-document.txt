@@ -1,0 +1,1 @@
+This is a sample document for testing the upload API endpoint. It contains some text that will be extracted and stored when uploaded through the Document Upload endpoint.
