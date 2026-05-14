@@ -54,11 +54,15 @@ public class DocumentController {
             // Get page count
             int pageCount = documentParsingService.getPageCount(file);
 
+                // Upload source file to OpenAI and keep the returned file id
+                String openAiFileId = documentAIService.uploadDocument(file);
+
             // Create response
             DocumentResponse response = new DocumentResponse(
                     documentParsingService.generateDocumentId(),
                     file.getOriginalFilename(),
                     content,
+                    openAiFileId,
                     LocalDateTime.now(),
                     pageCount
             );

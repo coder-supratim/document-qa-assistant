@@ -13,6 +13,7 @@ public class DocumentResponse {
     private String id;
     private String filename;
     private String content;
+    private String openAiFileId;
     private LocalDateTime uploadedAt;
     private int pageCount;
 }

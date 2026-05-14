@@ -20,6 +20,7 @@ public class DocumentParsingService {
         String contentType = file.getContentType();
         if (contentType != null && contentType.equals("application/pdf")) {
             // For PDFs, return a placeholder indicating PDF file was uploaded
+            
             return String.format("[PDF Document: %s - %d bytes]", file.getOriginalFilename(), fileBytes.length);
         } else {
             // For text files, return the content as string
