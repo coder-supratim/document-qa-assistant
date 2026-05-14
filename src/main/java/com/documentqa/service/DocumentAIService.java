@@ -26,10 +26,10 @@ public class DocumentAIService {
     private String openAiApiKey;
     
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String MODEL = "gpt-4";
+    private static final String MODEL = "gpt-5.4-mini";
 
     /**
-     * Ask a question about document content using GPT-4
+     * Ask a question about document content using OpenAI API
      * 
      * @param documentContent The content of the document
      * @param question The question to ask
