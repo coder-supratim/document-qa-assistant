@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.documentqa.model.AskQuestionRequest;
 import com.documentqa.model.DocumentResponse;
 import com.documentqa.model.QuestionAnswerResponse;
+import com.documentqa.model.TopicResponse;
 import com.documentqa.service.DocumentAIService;
 import com.documentqa.service.DocumentParsingService;
 import com.documentqa.service.DocumentStore;
@@ -142,7 +143,7 @@ public class DocumentController {
      * @return QuestionAnswerResponse with extracted topics
      */
     @GetMapping("/{documentId}/topics")
-    public ResponseEntity<QuestionAnswerResponse> extractTopics(@PathVariable String documentId) {
+    public ResponseEntity<TopicResponse> extractTopics(@PathVariable String documentId) {
         // Retrieve document from store
         var document = documentStore.findById(documentId);
         
@@ -152,11 +153,10 @@ public class DocumentController {
 
         DocumentResponse doc = document.get();
         
-        // Ask for topics
-        QuestionAnswerResponse topics = documentAIService.askQuestion(
-                doc.getContent(),
-                "List the main topics and key points covered in this document.",
-                documentId
+        // Ask for topics (structured list)
+        TopicResponse topics = documentAIService.extractTopics(
+            doc.getContent(),
+            documentId
         );
 
         return ResponseEntity.ok(topics);

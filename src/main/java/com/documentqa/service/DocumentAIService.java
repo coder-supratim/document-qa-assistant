@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.documentqa.model.QuestionAnswerResponse;
+import com.documentqa.model.TopicResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -134,6 +135,76 @@ public class DocumentAIService {
                     documentId,
                     0.0
             );
+        }
+    }
+
+    /**
+     * Extracts a structured list of topics from the document content.
+     * Returns a TopicResponse containing a list of topics and a confidence score.
+     */
+    public TopicResponse extractTopics(String documentContent, String documentId) {
+        try {
+            String systemPrompt = """
+                    You are a helpful document analysis assistant. Based on the provided document content,
+                    extract the main topics covered in the document.
+                    """;
+
+            String userMessage = String.format("""
+                    Document Content:
+                    %s
+
+                    Task: List the main topics covered in this document as a JSON array of strings only.
+                    Example output: ["topic1", "topic2"]
+                    """, documentContent);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", model);
+            requestBody.put("temperature", 0.0);
+            requestBody.put("messages", List.of(
+                    Map.of("role", "system", "content", systemPrompt),
+                    Map.of("role", "user", "content", userMessage)
+            ));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + openAiApiKey);
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+            String response = restTemplate.postForObject(OPENAI_API_URL, request, String.class);
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response);
+            String content = root.path("choices").get(0).path("message").path("content").asText();
+
+            List<String> topics;
+            try {
+                topics = mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+            } catch (Exception e) {
+                // Fallback: parse lines and remove numbering/bullets
+                topics = new java.util.ArrayList<>();
+                for (String line : content.split("\\r?\\n")) {
+                    String t = line.trim();
+                    if (t.isEmpty()) continue;
+                    t = t.replaceAll("^\\d+\\.\\s*", "");
+                    t = t.replaceAll("^[\\-\\*\\•]\\s*", "");
+                    // If line contains commas, split into multiple topics
+                    if (t.contains(",")) {
+                        for (String part : t.split(",")) {
+                            String p = part.trim();
+                            if (!p.isEmpty()) topics.add(p);
+                        }
+                    } else {
+                        topics.add(t);
+                    }
+                }
+            }
+
+            double confidence = calculateConfidence(documentContent, "extract topics", String.join(" ", topics));
+
+            return new TopicResponse(topics, documentId, confidence);
+        } catch (Exception e) {
+            return new TopicResponse(java.util.Collections.emptyList(), documentId, 0.0);
         }
     }
 

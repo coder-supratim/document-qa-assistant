@@ -5,7 +5,7 @@ An intelligent document question-answering system built with **Spring Boot** and
 ## 🎯 Features
 
 - **Document Upload**: Support for PDF and text file uploads
-- **Intelligent Q&A**: Ask questions about document content using GPT-4
+- **Intelligent Q&A**: Ask questions about document content using GPT-5.4-mini
 - **Document Summary**: Auto-generate summaries of uploaded documents
 - **Topic Extraction**: Extract key topics from documents
 - **RESTful API**: Clean, easy-to-use API endpoints
